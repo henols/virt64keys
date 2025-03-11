@@ -19,14 +19,12 @@ class IProcessHandler {
     // handshake() is called with a command string extracted from the stream.
     // If the command matches this handler, the handler should send a selection
     // response using the stream and return true; otherwise, false.
-    bool handshake(Stream *stream) {
-        if (stream->available() < 1) {
-            return false;
-        }
-        std::string cmd = stream->readStringUntil(' ');
+    bool handshake(const std::string &cmd, Stream *stream) {
         bool res = validateHandshake(cmd);
         if (res) {
             currentStream = stream;
+            currentStream->write(response.c_str(), response.size());
+            eventHandshakeDone = true;
         }
         return res;
     }
