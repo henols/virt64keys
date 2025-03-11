@@ -5,8 +5,6 @@
 
 #include "Stream.h"  // Your minimal Stream interface
 
-
-
 // ProcessStatus indicates the state after processing data.
 enum class ProcessStatus {
     NotProcess,  // The incoming data does not belong to this handler.
@@ -41,13 +39,13 @@ class IProcessHandler {
     virtual void release() = 0;
 
     virtual ~IProcessHandler() {}
-    private:
 
+   private:
    protected:
     Stream *currentStream;
-    virtual bool validateHandshake(const std::string &cmd) = 0;
     std::string response;
     bool eventHandshakeDone = false;
+    virtual bool validateHandshake(const std::string &cmd) = 0;
 };
 
 #endif  // IPROCESSHANDLER_H

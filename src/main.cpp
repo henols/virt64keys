@@ -45,32 +45,31 @@ IProcessHandler* processHandlers[] = {
 ProcessManager processManager(processHandlers, 4);
 
 static const char* TAG = "Main";
+void tcp_connection_established(int client_sock);
+void tcp_connection_closed();
 
 // Callback functions to be called from the TCP server task.
 void tcp_connection_established(int client_sock) {
     // If there's an old connection, close it.
     ESP_LOGI(TAG, "Establishing TCP connection.");
-
+    tcp_connection_closed();
     tcpStream = new TCPStream(client_sock);
-    ESP_LOGI(TAG, "TCPStream created.");
     processManager.registerStream(tcpStream);
-    ESP_LOGI(TAG, "TCPStream registered.");
 }
 
 void tcp_connection_closed() {
-    ESP_LOGI(TAG, "Closing TCP connection.");
     if (tcpStream != nullptr) {
+        ESP_LOGI(TAG, "Closing TCP connection.");
         processManager.unregisterStream(tcpStream);
         delete tcpStream;
         tcpStream = nullptr;
     }
-    ESP_LOGI(TAG, "TCPStream closed.");
 }
 
 void process_manager_task(void* pvParameters) {
     while (1) {
         processManager.process();
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
 
@@ -94,10 +93,5 @@ extern "C" void app_main(void) {
         // to be updated via WiFiConfig (to be implemented later).
     }
 
-    //    xTaskCreate(&process_manager_task,  "process_manager", 4096, NULL, 5, NULL);
-
-    while (1) {
-        processManager.process();
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
+        xTaskCreate(&process_manager_task,  "process_manager", 4096, NULL, 5, NULL);
 }

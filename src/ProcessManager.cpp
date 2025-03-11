@@ -22,34 +22,30 @@ ProcessManager::ProcessManager(IProcessHandler **handlers, size_t count)
             if (stream != nullptr) {
                 res = process(stream);
             }
-            ESP_LOGI(TAG, "ProcessManager giving back mutex.");
             xSemaphoreGive(streamMutex);
-            ESP_LOGI(TAG, "ProcessManager mutex given back.");
         }
         return res;
     }
 
 
     bool ProcessManager::process(Stream *localStream) {
-        ESP_LOGI(TAG, "ProcessManager processing stream.");
         int avl = localStream->available();
         if (avl < 1) {
-            localStream->write("no data available\n", 18);
-            // ESP_LOGI(TAG, "ProcessManager no data available %d.",avl);
             return false;
         }
-        ESP_LOGI(TAG, "ProcessManager data available %d.", avl);
         int firstByte = localStream->read();
-
+        // if(firstByte < 0) {
+        //     return false;
+        // }
         if (firstByte == '@') {
             ESP_LOGI(TAG, "ProcessManager received handshake marker.");
-            // std::string cmd = stream->readStringUntil(' ');
+            std::string cmd = stream->readStringUntil(' ');
 
-            // for (size_t i = 0; i < _count; i++) {
-            //     if (_handlers[i]->handshake(cmd, localStream)) {
-            //         return true;
-            //     }
-            // }
+            for (size_t i = 0; i < _count; i++) {
+                if (_handlers[i]->handshake(cmd, localStream)) {
+                    return true;
+                }
+            }
         } else if (firstByte == '#') {
             ESP_LOGI(TAG, "ProcessManager received process marker.");
             // for (size_t i = 0; i < _count; i++) {

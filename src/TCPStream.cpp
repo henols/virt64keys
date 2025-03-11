@@ -15,7 +15,6 @@
 #include "lwip/sockets.h"
 
 static const char* TAG = "TCPStream";
-std::vector<char> buffer;
 
 TCPStream::TCPStream(int socket_fd)
     : socket_fd(socket_fd), peekBuffer(0), hasPeeked(false), connected(true) {
@@ -37,12 +36,17 @@ int TCPStream::isConnected() {
 }
 
 int TCPStream::available() {
-    return fillBuffer();
+    int n = fillBuffer();
+    if (n < 1) {
+        return 0;
+    }
+    return n;
 }
 
 int TCPStream::read() {
     int byte = peek();
     if (byte < 0) {
+        
         return byte;
     }
     if (byte >= 0) {
@@ -68,6 +72,7 @@ int TCPStream::read(char* dest, int len) {
 int TCPStream::peek() {
     int n = fillBuffer();
     if (n < 1) {
+        ESP_LOGI(TAG, "No data available. %d", n);
         return -1;
     }
     return static_cast<unsigned char>(buffer.front());
@@ -95,7 +100,6 @@ std::string TCPStream::readStringUntil(char terminator) {
             break;
         }
         cmd.push_back(static_cast<char>(c));
-        ESP_LOGI(TAG, "Read: %c", c);        
     }
     return cmd;
 }
@@ -106,16 +110,17 @@ int TCPStream::fillBuffer() {
         return buffer.size();
     }
     if (isConnected() < 0) {
+        ESP_LOGW(TAG, "Not connected");
         return -2;
     }
-    char tmp[4096];
+    char tmp[256];
     // Continue reading until no more data is available.
     while (true) {
         ssize_t n = recv(socket_fd, tmp, sizeof(tmp), MSG_DONTWAIT);
         if (n > 0) {
             // Append the read bytes to the buffer.
             buffer.insert(buffer.end(), tmp, tmp + n);
-            ESP_LOGI(TAG, "Read %d bytes, %s", n, buffer.data());
+            // ESP_LOGI(TAG, "Read %d bytes, %s", n, buffer.data());
         } else if (n == 0) {
             // Socket closed gracefully.
             ESP_LOGE(TAG, "Error reading from socket: %s", strerror(errno));
@@ -123,6 +128,7 @@ int TCPStream::fillBuffer() {
             break;
         } else {
             if (errno == EWOULDBLOCK || errno == EAGAIN) {
+                // ESP_LOGI(TAG,  "No more data available right now.");
                 // No more data available right now.
                 break;
             } else {
@@ -137,6 +143,5 @@ int TCPStream::fillBuffer() {
         ESP_LOGE(TAG, "Error reading from socket: %s", strerror(errno));
         return -2;
     }
-    ESP_LOGI(TAG, "Buffer size: %d", buffer.size());
     return buffer.size();
 }
