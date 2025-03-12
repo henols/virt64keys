@@ -7,15 +7,18 @@
 #include "ProcessManager.h"
 #include "RingBuffer.h"
 #include "SerialStream.h"
-#include "Stream.h"  // Your Stream implementation, e.g., ConsoleStream
+#include "Stream.h"  
 #include "TCPStream.h"
 #include "WiFiConfig.h"
 #include "esp_log.h"
+#include "esp_spiffs.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "ota_http.h"
 #include "tcp_server_task.h"  // Include our TCP server task header
 #include "wifi_common.h"
 #include "wifi_init.h"
+#include "filesystem.h"
 
 // Define the matrix pins (adjust as needed).
 const uint8_t rowPins[8] = {2, 3, 4, 5, 6, 7, 8, 9};
@@ -47,6 +50,7 @@ ProcessManager processManager(processHandlers, 4);
 static const char* TAG = "Main";
 void tcp_connection_established(int client_sock);
 void tcp_connection_closed();
+void init_spiffs();
 
 // Callback functions to be called from the TCP server task.
 void tcp_connection_established(int client_sock) {
@@ -77,7 +81,7 @@ extern "C" void app_main(void) {
     ESP_LOGI(TAG, "Application started");
     // Wait for Wi-Fi connection before starting the TCP server.
     //    matrixScanner.begin();
-    ESP_LOGI(TAG, "Starting Wi‑Fi initialization...");
+    init_spiffs();
     wifi_init_and_start();
 
     // Wait until connected.
@@ -92,6 +96,6 @@ extern "C" void app_main(void) {
         // In a complete implementation, here you would wait for Wi‑Fi credentials
         // to be updated via WiFiConfig (to be implemented later).
     }
-
-        xTaskCreate(&process_manager_task,  "process_manager", 4096, NULL, 5, NULL);
+    start_ota_http_server();
+    xTaskCreate(&process_manager_task, "process_manager", 4096, NULL, 5, NULL);
 }
