@@ -17,11 +17,16 @@
 static const char* TAG = "TCPStream";
 
 TCPStream::TCPStream(int socket_fd)
-    : socket_fd(socket_fd), peekBuffer(0), hasPeeked(false), connected(true) {
+    : socket_fd(socket_fd), peekBuffer(0), hasPeeked(false) {
     // Optionally set the socket to non-blocking mode if desired.
     // int flags = fcntl(socket_fd, F_GETFL, 0);
     // // Set non-blocking flag (O_NONBLOCK)
     // fcntl(socket_fd, F_SETFL, flags | O_NONBLOCK);
+
+    
+    
+    connected = true;    
+
 }
 
 TCPStream::~TCPStream() {
@@ -29,10 +34,6 @@ TCPStream::~TCPStream() {
     if (socket_fd >= 0) {
         lwip_close(socket_fd);
     }
-}
-
-int TCPStream::isConnected() {
-    return connected ? 0 : -1;
 }
 
 int TCPStream::available() {

@@ -17,7 +17,10 @@ public:
     // Returns the next byte without consuming it, or -1 if none available.
     virtual int peek() = 0;
     
-    virtual int isConnected() = 0;
+     int isConnected() {
+        return connected ? 0 : -1;
+
+     }
 
     // Writes 'len' bytes from data.
     virtual void write(const char* data, size_t len) = 0;
@@ -26,7 +29,8 @@ public:
     // returns the read string (without the terminator).
     virtual std::string readStringUntil(char terminator) = 0;
     private:
-    // bool connected;
+    protected:
+     bool connected;
 };
 
 #endif // STREAM_H

@@ -3,7 +3,8 @@
 
 #include <string>
 
-#include "Stream.h"  // Your minimal Stream interface
+#include "Stream.h"
+#include "esp_log.h"
 
 // ProcessStatus indicates the state after processing data.
 enum class ProcessStatus {
@@ -14,15 +15,16 @@ enum class ProcessStatus {
 
 class IProcessHandler {
    public:
-    // handshake() is called with a command string extracted from the stream.
-    // If the command matches this handler, the handler should send a selection
-    // response using the stream and return true; otherwise, false.
     bool handshake(const std::string &cmd, Stream *stream) {
-        bool res = validateHandshake(cmd);
-        if (res) {
+        bool res = false;
+        ESP_LOGI(TAG, "Validating handshake command: %s", cmd.c_str());
+        if (cmd == command) {
+            ESP_LOGI(TAG, "Handshake successful %s -> %s", command.c_str(), response.c_str());
+
             currentStream = stream;
             currentStream->write(response.c_str(), response.size());
             eventHandshakeDone = true;
+            res = true;
         }
         return res;
     }
@@ -42,10 +44,12 @@ class IProcessHandler {
 
    private:
    protected:
-    Stream *currentStream;
+    std::string command;
     std::string response;
+    Stream *currentStream;
     bool eventHandshakeDone = false;
-    virtual bool validateHandshake(const std::string &cmd) = 0;
+    const char *TAG;
+
 };
 
 #endif  // IPROCESSHANDLER_H

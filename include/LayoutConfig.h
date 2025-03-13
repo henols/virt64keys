@@ -6,7 +6,6 @@
 class LayoutConfig : public IProcessHandler {
 public:
     LayoutConfig();
-    virtual bool validateHandshake(const std::string &cmd) override;
     virtual ProcessStatus process() override;
     virtual void release() override;
 private:

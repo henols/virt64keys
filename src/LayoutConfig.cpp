@@ -2,18 +2,13 @@
 #include "esp_log.h"
 #include <string.h>
 
-static const char *TAG = "LayoutConfig";
 
 LayoutConfig::LayoutConfig() { 
+    TAG = "LayoutConfig";
+    command = "layout";
     response = "kblayout";
 }
 
-bool LayoutConfig::validateHandshake(const std::string &cmd) {
-    if (cmd == "lay?") {
-        return true;
-    }
-    return false;
-}
 
 ProcessStatus LayoutConfig::process() {
     // Just consume extra data.

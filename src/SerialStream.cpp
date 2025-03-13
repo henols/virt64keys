@@ -10,7 +10,7 @@
 static const char* TAG = "SerialStream";
 
 SerialStream::SerialStream(uart_port_t uart_num)
-    : uart_num(uart_num), peekBuffer(0), hasPeeked(false), connected(true) {
+    : uart_num(uart_num), peekBuffer(0), hasPeeked(false){
     // Configure UART parameters
     uart_config_t uart_config = {
         .baud_rate = 115200,
@@ -27,14 +27,12 @@ SerialStream::SerialStream(uart_port_t uart_num)
 
     // Install UART driver with a buffer size of 1024 bytes.
     ESP_ERROR_CHECK(uart_driver_install(uart_num, 1024, 0, 0, NULL, 0));
+    
+    connected = true;
 }
 
 SerialStream::~SerialStream() {
     uart_driver_delete(uart_num);
-}
-
-int SerialStream::isConnected() {
-    return connected ? 0 : -1;
 }
 
 int SerialStream::available() {

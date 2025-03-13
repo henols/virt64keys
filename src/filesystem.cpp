@@ -10,7 +10,7 @@ void init_spiffs(void)
     ESP_LOGI(TAG, "Mounting SPIFFS filesystem");
     esp_vfs_spiffs_conf_t conf = {
         .base_path = "/spiffs",
-        .partition_label = "storage", // Matches the partition label in your CSV
+        .partition_label = "flash", // Matches the partition label in your CSV
         .max_files = 5,               // Maximum number of files that can be open at once
         .format_if_mount_failed = true
     };

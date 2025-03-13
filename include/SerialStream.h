@@ -10,7 +10,6 @@ public:
     // Constructor accepts the UART port number (we'll use UART_NUM_2)
     SerialStream(uart_port_t uart_num = UART_NUM_2);
     virtual ~SerialStream();
-    virtual int isConnected() override;
     virtual int available() override;
     virtual int read() override;
     virtual int peek() override;
@@ -21,7 +20,6 @@ private:
     uart_port_t uart_num;
     int peekBuffer; // Stores a peeked byte, if any.
     bool hasPeeked;
-    bool connected;
 
 };
 

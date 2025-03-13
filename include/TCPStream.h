@@ -12,7 +12,6 @@ class TCPStream : public Stream {
     // Construct TCPStream from a connected socket.
     TCPStream(int sock);
     virtual ~TCPStream();
-    virtual int isConnected() override;
     virtual int available() override;
     virtual int read() override;
     virtual int read(char* dest, int len);
@@ -24,7 +23,6 @@ class TCPStream : public Stream {
     int socket_fd;   // the underlying socket descriptor
     int peekBuffer;  // holds a peeked byte
     bool hasPeeked;
-    bool connected;
     std::vector<char> buffer;  // holds the read-ahead buffer
 
     virtual int fillBuffer();

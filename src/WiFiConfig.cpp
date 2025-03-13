@@ -4,20 +4,13 @@
 #include "freertos/task.h"
 #include <string.h>
 
-static const char *TAG = "WiFiConfig";
 
 
 
 WiFiConfig::WiFiConfig() { 
+    TAG = "WiFiConfig";
+    command = "wifi";
     response = "net";
-}
-
-bool WiFiConfig::validateHandshake(const std::string &cmd) {
-    if (cmd == "wifi") {
-        ESP_LOGI(TAG, "WiFi config handler selected.");
-        return true;
-    }
-    return false;
 }
 
 ProcessStatus WiFiConfig::process() {

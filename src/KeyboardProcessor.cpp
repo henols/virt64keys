@@ -6,22 +6,15 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-static const char *TAG = "KeyboardProcessor";
+
 
 KeyboardProcessor::KeyboardProcessor(RingBuffer &rb)
-    : ringBuffer(&rb) {
-    response = "c64";
+: ringBuffer(&rb){
+        TAG = "KeyboardProcessor";
+        command = "cbm";
+     response = "c64";
 }
 
-bool KeyboardProcessor::validateHandshake(const std::string &cmd) {
-    // We expect the event handshake command to be "cbm"
-    ESP_LOGI(TAG, "Validating handshake command: %s", cmd.c_str());
-    if (cmd == "cbm") {
-        ESP_LOGI(TAG, "Keyboard processor handshake successful.");
-        return true;
-    }
-    return false;
-}
 
 ProcessStatus KeyboardProcessor::process() {
     if (!eventHandshakeDone || currentStream == nullptr) {

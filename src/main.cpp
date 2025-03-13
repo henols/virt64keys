@@ -96,6 +96,6 @@ extern "C" void app_main(void) {
         // In a complete implementation, here you would wait for Wi‑Fi credentials
         // to be updated via WiFiConfig (to be implemented later).
     }
-    start_ota_http_server();
+    // start_ota_http_server();
     xTaskCreate(&process_manager_task, "process_manager", 4096, NULL, 5, NULL);
 }
